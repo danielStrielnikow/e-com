@@ -24,9 +24,13 @@ public class CategoryController {
             @RequestParam(name = "pageNumber", defaultValue = AppConstants.Page_NUMBER, required = false)
             Integer pageNumber,
             @RequestParam(name = "pageSize", defaultValue = AppConstants.Page_SIZE, required = false)
-            Integer pageSize) {
+            Integer pageSize,
+            @RequestParam(name = "sortBy", defaultValue = AppConstants.SORT_CATEGORIES_BY, required = false)
+            String sortBy,
+            @RequestParam(name = "sortOrder", defaultValue = AppConstants.SORT_DIR, required = false)
+            String sortOrder) {
 
-        CategoryResponse allCategories = categoryService.getAllCategories(pageNumber, pageSize);
+        CategoryResponse allCategories = categoryService.getAllCategories(pageNumber, pageSize, sortBy, sortOrder);
         return ResponseEntity.ok(allCategories);
     }
 
