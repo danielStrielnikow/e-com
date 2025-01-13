@@ -1,9 +1,12 @@
 package pl.ecommerce.project.service;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import pl.ecommerce.project.exception.APIException;
 import pl.ecommerce.project.exception.ResourceNotFoundException;
 import pl.ecommerce.project.model.Category;
+import pl.ecommerce.project.payload.CategoryDTO;
+import pl.ecommerce.project.payload.CategoryResponse;
 import pl.ecommerce.project.repo.CategoryRepository;
 
 import java.util.List;
@@ -11,38 +14,51 @@ import java.util.List;
 @Service
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    private final ModelMapper modelMapper;
 
-    public CategoryService(CategoryRepository categoryRepository) {
+    public CategoryService(CategoryRepository categoryRepository, ModelMapper modelMapper) {
         this.categoryRepository = categoryRepository;
+        this.modelMapper = modelMapper;
     }
 
-    public List<Category> getAllCategories() {
+    public CategoryResponse getAllCategories() {
         List<Category> categories = categoryRepository.findAll();
         if (categories.isEmpty()) {
             throw new APIException("No category created till now");
         }
-        return categories;
+        List<CategoryDTO> categoryDTO = categories.stream()
+                .map(category -> modelMapper.map(category, CategoryDTO.class))
+                .toList();
+        CategoryResponse categoryResponse = new CategoryResponse();
+        categoryResponse.setContent(categoryDTO);
+        return categoryResponse;
     }
 
-    public void createCategory(Category category) {
-        Category savedCategory = categoryRepository.findByCategoryName(category.getCategoryName());
-        if (savedCategory != null) {
+    public CategoryDTO createCategory(CategoryDTO categoryDTO) {
+        Category category = modelMapper.map(categoryDTO, Category.class);
+        Category categoryFromDb = categoryRepository.findByCategoryName(category.getCategoryName());
+        if (categoryFromDb != null) {
             throw new APIException("Category with the name " + category.getCategoryName() + " already exists!!!");
         }
-        categoryRepository.save(category);
+
+        Category savedCategory = categoryRepository.save(category);
+        return modelMapper.map(savedCategory, CategoryDTO.class);
     }
 
-    public void deleteCategoryById(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
+    public CategoryDTO updateCategory(CategoryDTO categoryDTO, Long categoryId) {
+        Category existingCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
-        categoryRepository.delete(category);
+
+        existingCategory.setCategoryName(categoryDTO.getCategoryName());
+        Category savedCategory = categoryRepository.save(existingCategory);
+        return modelMapper.map(savedCategory, CategoryDTO.class );
     }
 
-
-    public void updateCategory(Category category, Long categoryId) {
-        categoryRepository.findById(categoryId)
+    public CategoryDTO deleteCategoryById(Long categoryId) {
+        Category existingCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
-        category.setCategoryId(categoryId);
-        categoryRepository.save(category);
+
+        categoryRepository.delete(existingCategory);
+        return modelMapper.map(existingCategory, CategoryDTO.class);
     }
 }
