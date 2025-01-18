@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import pl.ecommerce.project.exception.APIException;
 import pl.ecommerce.project.exception.ResourceNotFoundException;
 import pl.ecommerce.project.model.Category;
-import pl.ecommerce.project.payload.CategoryDTO;
+import pl.ecommerce.project.payload.dto.CategoryDTO;
 import pl.ecommerce.project.payload.CategoryResponse;
 import pl.ecommerce.project.repo.CategoryRepository;
 

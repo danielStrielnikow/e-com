@@ -3,6 +3,7 @@ package pl.ecommerce.project.payload;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pl.ecommerce.project.payload.dto.CategoryDTO;
 
 import java.util.List;
 
