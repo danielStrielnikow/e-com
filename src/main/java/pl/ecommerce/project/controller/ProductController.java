@@ -29,6 +29,12 @@ public class ProductController {
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
+    @GetMapping("/public/products/keyword/{keyword}")
+    public ResponseEntity<ProductResponse> getProductsByKeyWord(@PathVariable String keyword){
+        ProductResponse productResponse = productService.searchProductByKeyWord(keyword);
+        return new ResponseEntity<>(productResponse, HttpStatus.OK);
+    }
+
 
     @PostMapping("/admin/categories/{categoryId}/product")
     public ResponseEntity<ProductDTO> addProduct(@RequestBody Product product,
@@ -36,4 +42,6 @@ public class ProductController {
         ProductDTO productDTO = productService.addProduct(categoryId, product);
         return new ResponseEntity<>(productDTO, HttpStatus.CREATED);
     }
+
+
 }
