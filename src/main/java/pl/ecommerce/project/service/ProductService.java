@@ -82,7 +82,6 @@ public class ProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "product", productId));
 
         existingProduct.setProductName(product.getProductName());
-        existingProduct.setImage(product.getImage());
         existingProduct.setDescription(product.getDescription());
         existingProduct.setQuantity(product.getQuantity());
         existingProduct.setPrice(product.getPrice());
