@@ -91,4 +91,12 @@ public class ProductService {
         Product savedProduct = productRepository.save(existingProduct);
         return modelMapper.map(savedProduct, ProductDTO.class);
     }
+
+    public ProductDTO deleteProductById(Long productId) {
+        Product existingProduct = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "product", productId));
+
+        productRepository.delete(existingProduct);
+        return modelMapper.map(existingProduct, ProductDTO.class);
+    }
 }
