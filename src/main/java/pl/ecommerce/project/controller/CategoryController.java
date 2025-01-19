@@ -52,7 +52,9 @@ public class CategoryController {
     public ResponseEntity<CategoryDTO> deleteCategoryById(@PathVariable Long categoryId) {
         CategoryDTO deletedCategoryDTO = categoryService.deleteCategoryById(categoryId);
         return ResponseEntity.ok(deletedCategoryDTO);
-
     }
+
+
+    
 
 }

@@ -18,7 +18,7 @@ public class ProductController {
     }
 
     @GetMapping("/public/products")
-    public ResponseEntity<ProductResponse> getAllProduts() {
+    public ResponseEntity<ProductResponse> getAllProducts() {
         ProductResponse products = productService.getAllProducts();
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
@@ -43,5 +43,10 @@ public class ProductController {
         return new ResponseEntity<>(productDTO, HttpStatus.CREATED);
     }
 
-
+    @PutMapping("/admin/products/{productId}")
+    public ResponseEntity<ProductDTO> updateProduct(@RequestBody Product product,
+                                                    @PathVariable Long productId) {
+        ProductDTO updateProductDTO = productService.updateProduct(productId, product);
+        return new ResponseEntity<>(updateProductDTO, HttpStatus.OK);
+    }
 }

@@ -12,6 +12,7 @@ import pl.ecommerce.project.repo.CategoryRepository;
 import pl.ecommerce.project.repo.ProductRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -76,4 +77,19 @@ public class ProductService {
         return modelMapper.map(savedProduct, ProductDTO.class);
     }
 
+    public ProductDTO updateProduct(Long productId, Product product) {
+        Product existingProduct = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "product", productId));
+
+        existingProduct.setProductName(product.getProductName());
+        existingProduct.setImage(product.getImage());
+        existingProduct.setDescription(product.getDescription());
+        existingProduct.setQuantity(product.getQuantity());
+        existingProduct.setPrice(product.getPrice());
+        existingProduct.setDiscount(product.getDiscount());
+        existingProduct.setSpecialPrice(product.getSpecialPrice());
+
+        Product savedProduct = productRepository.save(existingProduct);
+        return modelMapper.map(savedProduct, ProductDTO.class);
+    }
 }
