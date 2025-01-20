@@ -44,22 +44,32 @@ public class ProductService {
     }
 
     public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
-        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
-        Page<Product> productPage = productRepository.findAll(pageable);
+        Pageable pageDetails = getPageDetails(pageNumber, pageSize, sortBy, sortOrder);
+        Page<Product> productPage = productRepository.findAll(pageDetails);
 
         return mapToProductResponse(productPage);
     }
 
-    public ProductResponse searchByCategory(Long categoryId) {
+    public ProductResponse searchByCategory(Long categoryId, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         Category category = fetchCategoryById(categoryId);
-        List<Product> products = productRepository.findByCategoryOrderByPriceAsc(category);
-        return mapToProductResponse(products);
+
+        Pageable pageDetails = getPageDetails(pageNumber, pageSize, sortBy, sortOrder);
+        Page<Product> productPage = productRepository.findByCategoryOrderByPriceAsc(category, pageDetails);
+
+        List<Product> product = productPage.getContent();
+        if (product.isEmpty()) {
+            throw new APIException(category.getCategoryName()+ " " + AppErrors.ERROR_CATEGORY_NO_PRODUCTS);
+        } else {
+            return mapToProductResponse(productPage);
+        }
+
     }
 
-    public ProductResponse searchProductByKeyWord(String keyword) {
-        List<Product> products = productRepository.findByProductNameLikeIgnoreCase('%' + keyword + '%');
-        return mapToProductResponse(products);
+    public ProductResponse searchProductByKeyWord(String keyword, Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        Pageable pageDetails = getPageDetails(pageNumber, pageSize, sortBy, sortOrder);
+        Page<Product> productPage = productRepository.findByProductNameLikeIgnoreCase('%' + keyword + '%', pageDetails);
+
+        return mapToProductResponse(productPage);
     }
 
     public ProductDTO addProduct(Long categoryId, ProductDTO productDTO) {
@@ -80,7 +90,8 @@ public class ProductService {
 
     public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
         Product product = fetchProductById(productId);
-        updateProductDetails(product, productDTO);
+        modelMapper.map(productDTO, product);
+        product.setSpecialPrice(calculateSpecialPrice(product.getPrice(), product.getDiscount()));
 
         Product updatedProduct = productRepository.save(product);
         return mapToProductDTO(updatedProduct);
@@ -88,9 +99,16 @@ public class ProductService {
 
     public ProductDTO updateProductImage(Long productId, MultipartFile image) throws IOException {
         Product product = fetchProductById(productId);
-        String fileName = fileService.uploadImage(imagePath, image);
-        product.setImage(fileName);
+        validateImageFile(image);
 
+        String fileName;
+        try {
+            fileName = fileService.uploadImage(imagePath, image);
+        } catch (IOException e) {
+            throw new IOException("Error uploading image", e);
+        }
+
+        product.setImage(fileName);
         Product updatedProduct = productRepository.save(product);
         return mapToProductDTO(updatedProduct);
     }
@@ -102,6 +120,7 @@ public class ProductService {
     }
 
     // Helper methods
+
     private ProductResponse mapToProductResponse(Page<Product> productPage) {
         if (productPage.isEmpty()) throw new APIException(AppErrors.ERROR_NO_PRODUCTS);
 
@@ -115,15 +134,6 @@ public class ProductService {
                 productPage.getTotalElements(),
                 productPage.getTotalPages(),
                 productPage.isLast());
-    }
-
-    private ProductResponse mapToProductResponse(List<Product> products) {
-        if (products.isEmpty()) throw new APIException(AppErrors.ERROR_NO_PRODUCTS);
-
-        List<ProductDTO> productDTOs = products.stream()
-                .map(this::mapToProductDTO)
-                .toList();
-        return new ProductResponse(productDTOs);
     }
 
     private Product fetchProductById(Long productId) {
@@ -140,16 +150,28 @@ public class ProductService {
         return modelMapper.map(product, ProductDTO.class);
     }
 
-    private void updateProductDetails(Product product, ProductDTO productDTO) {
-        product.setProductName(productDTO.getProductName());
-        product.setDescription(productDTO.getDescription());
-        product.setQuantity(productDTO.getQuantity());
-        product.setPrice(productDTO.getPrice());
-        product.setDiscount(productDTO.getDiscount());
-        product.setSpecialPrice(calculateSpecialPrice(productDTO.getPrice(), productDTO.getDiscount()));
-    }
-
     private double calculateSpecialPrice(double price, double discount) {
         return price - (discount / 100 * price);
+    }
+
+    private static Pageable getPageDetails(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        if (pageNumber < 0 || pageSize <= 0) {
+            throw new IllegalArgumentException("Page number must be non-negative and page size must be greater than 0");
+        }
+
+        Sort sortByAndOrder;
+        try {
+            sortByAndOrder = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid sortOrder: " + sortOrder);
+        }
+
+        return PageRequest.of(pageNumber, pageSize, sortByAndOrder);
+    }
+
+    private void validateImageFile(MultipartFile image) {
+        if (image.isEmpty() || !image.getContentType().startsWith("image/")) {
+            throw new APIException("Invalid image file");
+        }
     }
 }
