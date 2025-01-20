@@ -2,7 +2,6 @@ package pl.ecommerce.project.service;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import pl.ecommerce.project.exception.ResourceNotFoundException;
 import pl.ecommerce.project.model.Category;
 import pl.ecommerce.project.model.Product;
@@ -12,7 +11,6 @@ import pl.ecommerce.project.repo.CategoryRepository;
 import pl.ecommerce.project.repo.ProductRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -62,12 +60,12 @@ public class ProductService {
         return productResponse;
     }
 
-    public ProductDTO addProduct(Long categoryId, Product product) {
+    public ProductDTO addProduct(Long categoryId, ProductDTO productDTO) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
 
+        Product product = modelMapper.map(productDTO, Product.class);
         product.setImage("default.png");
-
         product.setCategory(category);
         double specialPrice = product.getPrice() -
                 ((product.getDiscount() * 0.01) * product.getPrice());
@@ -77,10 +75,11 @@ public class ProductService {
         return modelMapper.map(savedProduct, ProductDTO.class);
     }
 
-    public ProductDTO updateProduct(Long productId, Product product) {
+    public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
         Product existingProduct = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "product", productId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
+        Product product = modelMapper.map(productDTO, Product.class);
         existingProduct.setProductName(product.getProductName());
         existingProduct.setDescription(product.getDescription());
         existingProduct.setQuantity(product.getQuantity());
@@ -94,7 +93,7 @@ public class ProductService {
 
     public ProductDTO deleteProductById(Long productId) {
         Product existingProduct = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "product", productId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
         productRepository.delete(existingProduct);
         return modelMapper.map(existingProduct, ProductDTO.class);
