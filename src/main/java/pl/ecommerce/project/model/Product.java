@@ -15,10 +15,12 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
     @NotBlank
     @Size(min = 3, message = "Product name must contain at least 5 characters")
     private String productName;
     private String image;
+
     @NotBlank
     @Size(min = 6, message = "Description must contain at least 6 characters")
     private String description;

@@ -41,33 +41,29 @@ public class ProductService {
 
     public ProductResponse getAllProducts() {
         List<Product> products = productRepository.findAll();
-        List<ProductDTO> productDTOS = products.stream()
-                .map(product -> modelMapper.map(product, ProductDTO.class))
-                .toList();
-
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setContent(productDTOS);
-        return productResponse;
+        return getProductResponse(products);
     }
 
     public ProductResponse searchByCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
         List<Product> products = productRepository.findByCategoryOrderByPriceAsc(category);
-        List<ProductDTO> productDTOS = products.stream()
-                .map(product -> modelMapper.map(product, ProductDTO.class))
-                .toList();
-
-        ProductResponse productResponse = new ProductResponse();
-        productResponse.setContent(productDTOS);
-        return productResponse;
+        return getProductResponse(products);
     }
 
     public ProductResponse searchProductByKeyWord(String keyword) {
         List<Product> products = productRepository.findByProductNameLikeIgnoreCase('%' + keyword + '%');
+        return getProductResponse(products);
+    }
+
+    private ProductResponse getProductResponse(List<Product> products) {
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> modelMapper.map(product, ProductDTO.class))
                 .toList();
+
+        if (products.isEmpty()) {
+            throw new APIException("No product exist!!!");
+        }
 
         ProductResponse productResponse = new ProductResponse();
         productResponse.setContent(productDTOS);
