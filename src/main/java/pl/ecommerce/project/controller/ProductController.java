@@ -3,6 +3,7 @@ package pl.ecommerce.project.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import pl.ecommerce.project.model.Product;
 import pl.ecommerce.project.payload.ProductResponse;
 import pl.ecommerce.project.payload.dto.ProductDTO;
@@ -48,6 +49,13 @@ public class ProductController {
                                                     @PathVariable Long productId) {
         ProductDTO updateProductDTO = productService.updateProduct(productId, productDTO);
         return new ResponseEntity<>(updateProductDTO, HttpStatus.OK);
+    }
+
+    @PutMapping("/products/{productId}/image")
+    public ResponseEntity<ProductDTO> updateProductImage(@PathVariable Long productId,
+                                                         @RequestParam("Image") MultipartFile image) {
+        ProductDTO updatedProduct = productService.updateProductImage(productId, image);
+        return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
     }
 
     @DeleteMapping("/admin/products/{productId}")
