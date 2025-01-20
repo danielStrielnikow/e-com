@@ -1,6 +1,7 @@
 package pl.ecommerce.project.service;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pl.ecommerce.project.exception.ResourceNotFoundException;
@@ -10,24 +11,30 @@ import pl.ecommerce.project.payload.ProductResponse;
 import pl.ecommerce.project.payload.dto.ProductDTO;
 import pl.ecommerce.project.repo.CategoryRepository;
 import pl.ecommerce.project.repo.ProductRepository;
+import pl.ecommerce.project.service.fileService.FileServiceImpl;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
+
 
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
+    private final FileServiceImpl fileService;
 
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, ModelMapper modelMapper) {
+    @Value("${project.image}")
+    private  String path;
+
+    public ProductService(ProductRepository productRepository,
+                          CategoryRepository categoryRepository,
+                          ModelMapper modelMapper,
+                          FileServiceImpl fileService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
+        this.fileService = fileService;
     }
 
 
@@ -103,8 +110,7 @@ public class ProductService {
 
         // Upload image to server
         // Get the file name of uploaded image
-        String path = "images/";
-        String fileName = uploadImage(path, image);
+        String fileName = fileService.uploadImage(path, image);
 
         // Updating the new file nam eto the product
         productFromDB.setImage(fileName);
@@ -114,29 +120,6 @@ public class ProductService {
 
         // return DTO
         return modelMapper.map(updatedProduct, ProductDTO.class);
-    }
-
-    private String uploadImage(String path, MultipartFile file) throws IOException {
-        // File names of current / original file
-        String originalFileName = file.getOriginalFilename();
-
-        // Generate a unique file name
-        String randomId = UUID.randomUUID().toString();
-        String fileName = randomId.concat(originalFileName.substring(originalFileName.lastIndexOf('.')));
-        String filePath = path + File.separator + fileName;
-
-
-        // Check if path exist and create
-        File folder = new File(path);
-        if (!folder.exists()) {
-            folder.mkdir();
-        }
-
-        // Upload to server
-        Files.copy(file.getInputStream(), Paths.get(filePath));
-
-        // return file name
-        return fileName;
     }
 
     public ProductDTO deleteProductById(Long productId) {
