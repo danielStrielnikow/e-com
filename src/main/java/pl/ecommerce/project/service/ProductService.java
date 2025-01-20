@@ -97,7 +97,7 @@ public class ProductService {
         return modelMapper.map(savedProduct, ProductDTO.class);
     }
 
-    public ProductDTO updateProductImage(Long productId, MultipartFile image) {
+    public ProductDTO updateProductImage(Long productId, MultipartFile image) throws IOException {
         Product productFromDB = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
@@ -118,12 +118,12 @@ public class ProductService {
 
     private String uploadImage(String path, MultipartFile file) throws IOException {
         // File names of current / original file
-        String originalFileName = file.getName();
+        String originalFileName = file.getOriginalFilename();
 
         // Generate a unique file name
         String randomId = UUID.randomUUID().toString();
         String fileName = randomId.concat(originalFileName.substring(originalFileName.lastIndexOf('.')));
-        String filePath = path + File.pathSeparator + fileName;
+        String filePath = path + File.separator + fileName;
 
 
         // Check if path exist and create

@@ -9,6 +9,8 @@ import pl.ecommerce.project.payload.ProductResponse;
 import pl.ecommerce.project.payload.dto.ProductDTO;
 import pl.ecommerce.project.service.ProductService;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api")
 public class ProductController {
@@ -53,7 +55,7 @@ public class ProductController {
 
     @PutMapping("/products/{productId}/image")
     public ResponseEntity<ProductDTO> updateProductImage(@PathVariable Long productId,
-                                                         @RequestParam("Image") MultipartFile image) {
+                                                         @RequestParam("image") MultipartFile image) throws IOException {
         ProductDTO updatedProduct = productService.updateProductImage(productId, image);
         return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
     }
