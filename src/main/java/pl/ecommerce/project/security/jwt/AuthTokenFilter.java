@@ -19,15 +19,17 @@ import java.io.IOException;
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-    private final JwtUtils jwtUtils;
-    private final UserDetailsService userDetailsService;
+    @Autowired
+    private  JwtUtils jwtUtils;
+    @Autowired
+    private  UserDetailsService userDetailsService;
 
     private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
-    public AuthTokenFilter(JwtUtils jwtUtils, UserDetailsService userDetailsService) {
-        this.jwtUtils = jwtUtils;
-        this.userDetailsService = userDetailsService;
-    }
+
+
+
+
 
 
     @Override
