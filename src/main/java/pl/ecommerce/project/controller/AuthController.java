@@ -8,13 +8,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import pl.ecommerce.project.security.jwt.JwtUtils;
-import pl.ecommerce.project.security.jwt.LoginRequest;
-import pl.ecommerce.project.security.jwt.LoginResponse;
+import pl.ecommerce.project.security.request.LoginRequest;
+import pl.ecommerce.project.security.response.UserInfoResponse;
+import pl.ecommerce.project.security.services.UserDetailsImpl;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +45,7 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         String jwtToken = jwtUtils.generateTokenFromUsername(userDetails);
 
@@ -53,7 +53,8 @@ public class AuthController {
                 .map(GrantedAuthority::getAuthority)
                 .toList();
 
-        LoginResponse response = new LoginResponse(userDetails.getUsername(), roles, jwtToken);
+        UserInfoResponse response = new UserInfoResponse(userDetails.getId(),
+                userDetails.getUsername(), roles, jwtToken);
 
         return ResponseEntity.ok(response);
     }
