@@ -11,6 +11,7 @@ spring:
   app:
     jwtSecret: mySecretKey123912738549327432947297r4923dj23d432986743289642846d32bcd28374329ddnsjghsfduq
     jwtExpirationMs: 30000000
+    jwtCookieName: SpringBootEcom
 
 logging:
   level:
