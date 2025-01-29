@@ -45,8 +45,7 @@ public class User {
         this.password = password;
     }
 
-    @Getter
-    @Setter
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE},
                 fetch = FetchType.EAGER)
     @JoinTable(name = "user_role",
@@ -54,8 +53,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    @Getter
-    @Setter
+
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "user_address",
             joinColumns = @JoinColumn(name = "user_id"),
