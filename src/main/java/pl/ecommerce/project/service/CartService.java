@@ -101,4 +101,26 @@ public class CartService {
 
         return cartRepository.save(cart);
     }
+
+    public List<CartDTO> getAllCarts() {
+        List<Cart> carts = cartRepository.findAll();
+
+        if (carts.isEmpty()) {
+            throw new APIException("No cart exists");
+        }
+
+
+        return carts.stream()
+                .map(cart -> {
+                    CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
+
+                    List<ProductDTO> productDTOS = cart.getCartItems().stream()
+                            .map(p -> modelMapper.map(p.getProduct(), ProductDTO.class))
+                            .toList();
+
+                    cartDTO.setProducts(productDTOS);
+
+                    return cartDTO;
+                }).toList();
+    }
 }
