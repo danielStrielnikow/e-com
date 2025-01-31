@@ -78,13 +78,13 @@ public class CartService {
 
         List<CartItem> cartItems = cart.getCartItems();
 
-        Stream<ProductDTO> productStream = cartItems.stream().map(item -> {
+        Stream<ProductDTO> products = cartItems.stream().map(item -> {
             ProductDTO map = modelMapper.map(item.getProduct(), ProductDTO.class);
             map.setQuantity(item.getQuantity());
             return map;
         });
 
-        cartDTO.setProducts(productStream.toList());
+        cartDTO.setProducts(products.toList());
 
         return cartDTO;
     }
@@ -122,5 +122,20 @@ public class CartService {
 
                     return cartDTO;
                 }).toList();
+    }
+
+    public CartDTO getCart(String emailId, Long cartId) {
+        Cart cart = cartRepository.findCartByEmailAndCartId(emailId, cartId );
+        if (cart == null) {
+            throw new ResourceNotFoundException("Cart", "cartId", cartId);
+        }
+
+        CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
+        cart.getCartItems().forEach(c -> c.getProduct().setQuantity(c.getQuantity()));
+        List<ProductDTO> products = cart.getCartItems().stream()
+                .map(p -> modelMapper.map(p.getProduct(), ProductDTO.class))
+                .toList();
+        cartDTO.setProducts(products);
+        return cartDTO;
     }
 }
