@@ -7,6 +7,6 @@ import pl.ecommerce.project.model.CartItem;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
-    @Query("SELECT ci FROM CartItem ci WHERE ci.cart.cartId = ?1 AND ci.product.id = ?2")
-    CartItem findCartItemByProductIdAndCartId(Long id, Long productId);
+    @Query("SELECT ci FROM CartItem ci WHERE ci.cart.cartId = ?1 AND ci.product.productId = ?2")
+    CartItem findCartItemByCartIdAndProductId(Long id, Long productId);
 }
