@@ -77,19 +77,6 @@ public class CartService {
         return convertToCartDTO(cart);
     }
 
-    private Cart createCart() {
-        Cart userCart = cartRepository.findCartByEmail(authUtil.loggedInEmail());
-        if (userCart != null) {
-            return userCart;
-        }
-
-        Cart cart = new Cart();
-        cart.setTotalPrice(0.00);
-        cart.setUser(authUtil.loggedInUser());
-
-        return cartRepository.save(cart);
-    }
-
     public List<CartDTO> getAllCarts() {
         List<Cart> carts = cartRepository.findAll();
 
@@ -169,6 +156,27 @@ public class CartService {
         return convertToCartDTO(cart);
     }
 
+    public String deleteProductFromCart(Long cartId, Long productId) {
+        Cart cart = cartRepository.findById(cartId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cartId));
+
+        CartItem cartItem = cartItemRepository.findCartItemByCartIdAndProductId(cartId, productId);
+
+        if (cartItem == null) {
+            throw new ResourceNotFoundException("Product", "productId", productId);
+        }
+
+        cart.setTotalPrice(cart.getTotalPrice() - (cartItem.getProductPrice() * cartItem.getQuantity()));
+
+        Product product = cartItem.getProduct();
+        product.setQuantity(product.getQuantity() + cartItem.getQuantity());
+
+        cartItemRepository.deleteCartItemByCartIdAndProductId(cartId, productId);
+
+        return "Product " + cartItem.getProduct().getProductName() + " removed from the cart!";
+    }
+
+
     private CartDTO convertToCartDTO(Cart cart) {
         CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
 
@@ -184,5 +192,18 @@ public class CartService {
         cartDTO.setProducts(products);
 
         return cartDTO;
+    }
+
+    private Cart createCart() {
+        Cart userCart = cartRepository.findCartByEmail(authUtil.loggedInEmail());
+        if (userCart != null) {
+            return userCart;
+        }
+
+        Cart cart = new Cart();
+        cart.setTotalPrice(0.00);
+        cart.setUser(authUtil.loggedInUser());
+
+        return cartRepository.save(cart);
     }
 }
