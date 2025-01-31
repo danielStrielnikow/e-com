@@ -11,10 +11,13 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.ecommerce.project.config.AppErrors;
 import pl.ecommerce.project.exception.APIException;
 import pl.ecommerce.project.exception.ResourceNotFoundException;
+import pl.ecommerce.project.model.Cart;
 import pl.ecommerce.project.model.Category;
 import pl.ecommerce.project.model.Product;
 import pl.ecommerce.project.payload.ProductResponse;
+import pl.ecommerce.project.payload.dto.CartDTO;
 import pl.ecommerce.project.payload.dto.ProductDTO;
+import pl.ecommerce.project.repo.CartRepository;
 import pl.ecommerce.project.repo.CategoryRepository;
 import pl.ecommerce.project.repo.ProductRepository;
 import pl.ecommerce.project.service.fileService.FileServiceImpl;
@@ -29,6 +32,8 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ModelMapper modelMapper;
     private final FileServiceImpl fileService;
+    private final CartRepository cartRepository;
+    private final CartService cartService;
 
     @Value("${project.image}")
     private String imagePath;
@@ -36,11 +41,13 @@ public class ProductService {
     public ProductService(ProductRepository productRepository,
                           CategoryRepository categoryRepository,
                           ModelMapper modelMapper,
-                          FileServiceImpl fileService) {
+                          FileServiceImpl fileService, CartRepository cartRepository, CartService cartService) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.modelMapper = modelMapper;
         this.fileService = fileService;
+        this.cartRepository = cartRepository;
+        this.cartService = cartService;
     }
 
     public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
@@ -93,7 +100,25 @@ public class ProductService {
         modelMapper.map(productDTO, product);
         product.setSpecialPrice(calculateSpecialPrice(product.getPrice(), product.getDiscount()));
 
+        savedProductToDTO(productDTO, product);
         Product updatedProduct = productRepository.save(product);
+
+        List<Cart> carts = cartRepository.findCartByProductId(productId);
+
+        List<CartDTO> cartDTOS = carts.stream()
+                .map(cart -> {
+                    CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
+
+                    List<ProductDTO> products = cart.getCartItems().stream()
+                            .map(p -> modelMapper.map(p.getProduct(), ProductDTO.class))
+                            .toList();
+                    cartDTO.setProducts(products);
+
+                    return cartDTO;
+                }).toList();
+
+        cartDTOS.forEach(cart -> cartService.updateProductInCart(cart.getCartId(), productId));
+
         return mapToProductDTO(updatedProduct);
     }
 
@@ -115,8 +140,21 @@ public class ProductService {
 
     public ProductDTO deleteProductById(Long productId) {
         Product product = fetchProductById(productId);
+
+        List<Cart> carts = cartRepository.findCartByProductId(productId);
+        carts.forEach(cart -> cartService.deleteProductFromCart(cart.getCartId(), productId));
+
         productRepository.delete(product);
         return mapToProductDTO(product);
+    }
+
+    private static void savedProductToDTO(ProductDTO productDTO, Product product) {
+        product.setProductName(productDTO.getProductName());
+        product.setDescription(productDTO.getDescription());
+        product.setQuantity(productDTO.getQuantity());
+        product.setDiscount(productDTO.getDiscount());
+        product.setPrice(productDTO.getPrice());
+        product.setSpecialPrice(productDTO.getSpecialPrice());
     }
 
     // Helper methods
