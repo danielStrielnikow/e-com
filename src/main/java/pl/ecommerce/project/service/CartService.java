@@ -38,7 +38,7 @@ public class CartService {
     }
 
     public CartDTO addProductToCart(Long productId, Integer quantity) {
-        Cart cart = createCart();
+        Cart cart = getOrCreateCart();
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
@@ -141,12 +141,22 @@ public class CartService {
             throw new APIException("Product" + product.getProductName() + " not available in the cart!");
         }
 
-        cartItem.setProductPrice(product.getSpecialPrice());
-        cartItem.setQuantity(cartItem.getQuantity() + quantity);
-        cartItem.setDiscount(product.getDiscount());
-        cart.setTotalPrice(cart.getTotalPrice() + (cartItem.getProductPrice() * quantity));
+        // Calculate new quantity
+        int newQuantity = cartItem.getQuantity() + quantity;
+        // Validation to prevent negative quantities
+        if (newQuantity < 0) {
+            throw new APIException("The resulting quantity cannot be negative");
+        }
 
-        cartRepository.save(cart);
+        if (newQuantity == 0) {
+            deleteProductFromCart(cartId, productId);
+        } else {
+            cartItem.setProductPrice(product.getSpecialPrice());
+            cartItem.setQuantity(cartItem.getQuantity() + quantity);
+            cartItem.setDiscount(product.getDiscount());
+            cart.setTotalPrice(cart.getTotalPrice() + (cartItem.getProductPrice() * quantity));
+            cartRepository.save(cart);
+        }
 
         CartItem updateItem = cartItemRepository.save(cartItem);
         if (updateItem.getQuantity() == 0) {
@@ -156,6 +166,7 @@ public class CartService {
         return convertToCartDTO(cart);
     }
 
+    @Transactional
     public String deleteProductFromCart(Long cartId, Long productId) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cart", "cartId", cartId));
@@ -180,9 +191,8 @@ public class CartService {
     private CartDTO convertToCartDTO(Cart cart) {
         CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
 
-        List<CartItem> cartItems = cart.getCartItems();
 
-        List<ProductDTO> products = cartItems.stream()
+        List<ProductDTO> products = cart.getCartItems().stream()
                 .map(item -> {
                     ProductDTO productDTO = modelMapper.map(item.getProduct(), ProductDTO.class);
                     productDTO.setQuantity(item.getQuantity());
@@ -194,7 +204,7 @@ public class CartService {
         return cartDTO;
     }
 
-    private Cart createCart() {
+    private Cart getOrCreateCart() {
         Cart userCart = cartRepository.findCartByEmail(authUtil.loggedInEmail());
         if (userCart != null) {
             return userCart;
