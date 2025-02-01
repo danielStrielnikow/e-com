@@ -12,6 +12,7 @@ import pl.ecommerce.project.exception.ResourceNotFoundException;
 import pl.ecommerce.project.model.Category;
 import pl.ecommerce.project.payload.CategoryResponse;
 import pl.ecommerce.project.payload.dto.CategoryDTO;
+import pl.ecommerce.project.payload.dto.DTOMapper;
 import pl.ecommerce.project.repo.CategoryRepository;
 
 import java.util.List;
@@ -20,11 +21,11 @@ import java.util.List;
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-    private final ModelMapper modelMapper;
+    private final DTOMapper dtoMapper;
 
-    public CategoryService(CategoryRepository categoryRepository, ModelMapper modelMapper) {
+    public CategoryService(CategoryRepository categoryRepository, DTOMapper dtoMapper) {
         this.categoryRepository = categoryRepository;
-        this.modelMapper = modelMapper;
+        this.dtoMapper = dtoMapper;
     }
 
     public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
@@ -44,8 +45,8 @@ public class CategoryService {
             throw new APIException(AppErrors.ERROR_CATEGORY_EXISTS);
         }
 
-        Category savedCategory = categoryRepository.save(mapToEntity(categoryDTO));
-        return mapToDTO(savedCategory);
+        Category savedCategory = categoryRepository.save(dtoMapper.mapCategoryToEntity(categoryDTO));
+        return dtoMapper.mapToCategoryDTO(savedCategory);
     }
 
     public CategoryDTO updateCategory(CategoryDTO categoryDTO, Long categoryId) {
@@ -54,13 +55,13 @@ public class CategoryService {
         existingCategory.setCategoryName(categoryDTO.getCategoryName());
         Category updatedCategory = categoryRepository.save(existingCategory);
 
-        return mapToDTO(updatedCategory);
+        return dtoMapper.mapToCategoryDTO(updatedCategory);
     }
 
     public CategoryDTO deleteCategoryById(Long categoryId) {
         Category existingCategory = fetchCategoryById(categoryId);
         categoryRepository.delete(existingCategory);
-        return mapToDTO(existingCategory);
+        return dtoMapper.mapToCategoryDTO(existingCategory);
     }
     private CategoryResponse getCategoryResponse(Page<Category> categoryPage) {
         if (categoryPage.isEmpty()) {
@@ -69,7 +70,7 @@ public class CategoryService {
 
         List<CategoryDTO> categoryDTOS = categoryPage.getContent()
                 .stream()
-                .map(this::mapToDTO)
+                .map(dtoMapper::mapToCategoryDTO)
                 .toList();
 
         return new CategoryResponse(
@@ -87,12 +88,5 @@ public class CategoryService {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
     }
-
-    private CategoryDTO mapToDTO(Category category) {
-        return modelMapper.map(category, CategoryDTO.class);
-    }
-
-    private Category mapToEntity(CategoryDTO categoryDTO) {
-        return modelMapper.map(categoryDTO, Category.class);
-    }
 }
+
