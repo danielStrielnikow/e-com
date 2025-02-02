@@ -25,6 +25,8 @@ public class CartService {
     private final AuthUtil authUtil;
     private final DTOMapper dtoMapper;
 
+    private final double INITIAL_NUMBER = 0.00;
+
     public CartService(CartRepository cartRepository,
                        CartItemRepository cartItemRepository,
                        ProductRepository productRepository,
@@ -170,9 +172,9 @@ public class CartService {
     }
 
     public void updateProductInCart(Long cartId, Long productId) {
-        Cart cart = fetchCartById(cartId);
-
         Product product = fetchProductById(productId);
+
+        Cart cart = fetchCartById(cartId);
 
         CartItem cartItem = cartItemRepository.findCartItemByCartIdAndProductId(cartId, productId);
 
@@ -207,7 +209,7 @@ public class CartService {
         }
 
         Cart cart = new Cart();
-        cart.setTotalPrice(0.00);
+        cart.setTotalPrice(INITIAL_NUMBER);
         cart.setUser(authUtil.loggedInUser());
 
         return cartRepository.save(cart);

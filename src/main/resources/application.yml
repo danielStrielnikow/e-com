@@ -3,15 +3,23 @@ spring:
     user:
       name: admin
       password: admin
-  h2:
-    console:
-      enabled: true
-  datasource:
-    url: jdbc:h2:mem:test
+#  h2:
+#    console:
+#      enabled: true
+#  datasource:
+#    url: jdbc:h2:mem:test
   app:
     jwtSecret: mySecretKey123912738549327432947297r4923dj23d432986743289642846d32bcd28374329ddnsjghsfduq
     jwtExpirationMs: 30000000
     jwtCookieName: SpringBootEcom
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ecommerce
+    username: daniel
+    password: daniel
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
 logging:
   level:
