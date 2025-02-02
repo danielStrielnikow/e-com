@@ -75,7 +75,23 @@ public class AddressService {
         updateAddressFromDTO(addressDTO, address);
         Address updatedAddress = addressRepository.save(address);
 
+        User user = address.getUser();
+        user.getAddresses().removeIf(a -> a.getAddressId().equals(addressId));
+        user.getAddresses().add(updatedAddress);
+        userRepository.save(user);
         return dtoMapper.mapToAddressDTO(updatedAddress);
+    }
+
+    @Transactional
+    public String deleteAddress(Long addressId) {
+        Address address = fetchAddressById(addressId);
+
+        User user = address.getUser();
+        user.getAddresses().removeIf(a -> a.getAddressId().equals(addressId));
+        userRepository.save(user);
+
+        addressRepository.delete(address);
+        return "address deleted successfully with addressId" + addressId;
     }
 
 
@@ -92,5 +108,4 @@ public class AddressService {
         address.setCountry(addressDTO.getCountry());
         address.setPinCode(addressDTO.getPinCode());
     }
-
 }
