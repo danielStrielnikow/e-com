@@ -21,15 +21,15 @@ spring:
       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-logging:
-  level:
-    org:
-      springframework: DEBUG
-      security: DEBUG
-      hibernate:
-        SQL: DEBUG
-    pl:
-      ecommerce:
-        project: DEBUG
+#logging:
+#  level:
+#    org:
+#      springframework: DEBUG
+#      security: DEBUG
+#      hibernate:
+#        SQL: DEBUG
+#    pl:
+#      ecommerce:
+#        project: DEBUG
 project:
   image: images/
