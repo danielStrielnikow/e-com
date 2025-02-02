@@ -9,6 +9,8 @@ import pl.ecommerce.project.payload.dto.AddressDTO;
 import pl.ecommerce.project.service.AddressService;
 import pl.ecommerce.project.util.AuthUtil;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 public class AddressController {
@@ -26,6 +28,25 @@ public class AddressController {
         AddressDTO savedAddressDTO = addressService.createAddress(addressDTO, user);
         return new ResponseEntity<>(savedAddressDTO, HttpStatus.CREATED);
 
+    }
+
+    @GetMapping("/address")
+    public ResponseEntity<List<AddressDTO>> getAllAddress() {
+        List<AddressDTO> address = addressService.getAllAddresses();
+        return new ResponseEntity<>(address, HttpStatus.OK);
+    }
+
+    @GetMapping("/user/addresses")
+    public ResponseEntity<List<AddressDTO>> getUserAddress() {
+        User user = authUtil.loggedInUser();
+        List<AddressDTO> userAddress = addressService.getUserAddresses(user);
+        return new ResponseEntity<>(userAddress, HttpStatus.OK);
+    }
+
+    @GetMapping("/address/{addressId}")
+    public ResponseEntity<AddressDTO> getAddress(@PathVariable Long addressId) {
+        AddressDTO address = addressService.getAddressById(addressId);
+        return new ResponseEntity<>(address, HttpStatus.OK);
     }
 
 

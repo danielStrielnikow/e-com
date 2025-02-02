@@ -2,6 +2,7 @@ package pl.ecommerce.project.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.ecommerce.project.exception.APIException;
 import pl.ecommerce.project.exception.ResourceNotFoundException;
 import pl.ecommerce.project.model.Address;
 import pl.ecommerce.project.model.User;
@@ -37,8 +38,44 @@ public class AddressService {
         return dtoMapper.mapToAddressDTO(savedAddress);
     }
 
-    private User fetchUserById(Long user) {
-        return userRepository.findById(user)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "user", user));
+    public List<AddressDTO> getAllAddresses() {
+        List<Address> addressList = addressRepository.findAll();
+
+        if (addressList.isEmpty()) {
+            throw new APIException("No address exists");
+        }
+
+        return addressList.stream()
+                .map(dtoMapper::mapToAddressDTO)
+                .toList();
+    }
+
+    public AddressDTO getAddressById(Long addressId) {
+        Address address = fetchAddressById(addressId);
+        return dtoMapper.mapToAddressDTO(address);
+    }
+
+
+    public List<AddressDTO> getUserAddresses(User user) {
+        List<Address> addressList = user.getAddresses();
+
+        if (addressList.isEmpty()) {
+            throw new APIException("No address exists");
+        }
+
+        return addressList.stream()
+                .map(dtoMapper::mapToAddressDTO)
+                .toList();
+    }
+
+
+    private User fetchUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+    }
+
+    private Address fetchAddressById(Long addressId) {
+        return addressRepository.findById(addressId)
+                .orElseThrow(() -> new ResourceNotFoundException("Address", "address", addressId));
     }
 }
