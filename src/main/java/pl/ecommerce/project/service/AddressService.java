@@ -68,14 +68,29 @@ public class AddressService {
                 .toList();
     }
 
+    @Transactional
+    public AddressDTO updateAddress(Long addressId, AddressDTO addressDTO) {
+        Address address = fetchAddressById(addressId);
 
-    private User fetchUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
+        updateAddressFromDTO(addressDTO, address);
+        Address updatedAddress = addressRepository.save(address);
+
+        return dtoMapper.mapToAddressDTO(updatedAddress);
     }
+
 
     private Address fetchAddressById(Long addressId) {
         return addressRepository.findById(addressId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "address", addressId));
     }
+
+    private void updateAddressFromDTO(AddressDTO addressDTO, Address address) {
+        address.setStreet(addressDTO.getStreet());
+        address.setBuildingName(addressDTO.getBuildingName());
+        address.setCity(addressDTO.getCity());
+        address.setState(addressDTO.getState());
+        address.setCountry(addressDTO.getCountry());
+        address.setPinCode(addressDTO.getPinCode());
+    }
+
 }

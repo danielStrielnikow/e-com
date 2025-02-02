@@ -140,7 +140,7 @@ public class ProductService {
         return dtoMapper.mapToProductDTO(product);
     }
 
-    private static void updateProductFromDTO(ProductDTO productDTO, Product product) {
+    private void updateProductFromDTO(ProductDTO productDTO, Product product) {
         product.setProductName(productDTO.getProductName());
         product.setDescription(productDTO.getDescription());
         product.setQuantity(productDTO.getQuantity());
