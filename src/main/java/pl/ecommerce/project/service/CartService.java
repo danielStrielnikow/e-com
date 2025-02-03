@@ -16,6 +16,9 @@ import pl.ecommerce.project.repo.ProductRepository;
 import pl.ecommerce.project.util.AuthUtil;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @Service
 public class CartService {
@@ -79,18 +82,20 @@ public class CartService {
         }
 
 
-        return carts.stream()
-                .map(cart -> {
-                    CartDTO cartDTO = dtoMapper.mapToCartDTO(cart);
+        return carts.stream().map(cart -> {
+            CartDTO cartDTO = dtoMapper.mapToCartDTO(cart);
 
-                    List<ProductDTO> productDTOS = cart.getCartItems().stream()
-                            .map(p -> dtoMapper.mapToProductDTO(p.getProduct()))
-                            .toList();
+            List<ProductDTO> products = cart.getCartItems().stream().map(cartItem -> {
+                ProductDTO productDTO = dtoMapper.mapToProductDTO(cartItem.getProduct());
+                productDTO.setQuantity(cartItem.getQuantity()); // Set the quantity from CartItem
+                return productDTO;
+            }).toList();
 
-                    cartDTO.setProducts(productDTOS);
 
-                    return cartDTO;
-                }).toList();
+            cartDTO.setProducts(products);
+
+            return cartDTO;
+        }).toList();
     }
 
     public CartDTO getCart(String emailId, Long cartId) {

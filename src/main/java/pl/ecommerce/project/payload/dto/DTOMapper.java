@@ -2,10 +2,7 @@ package pl.ecommerce.project.payload.dto;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
-import pl.ecommerce.project.model.Address;
-import pl.ecommerce.project.model.Cart;
-import pl.ecommerce.project.model.Category;
-import pl.ecommerce.project.model.Product;
+import pl.ecommerce.project.model.*;
 
 import java.util.List;
 @Component
@@ -54,6 +51,12 @@ public class DTOMapper {
         return modelMapper.map(address, AddressDTO.class);
     }
 
+    public OrderDTO mapToOrderDTO(Order order) {
+        return modelMapper.map(order, OrderDTO.class);
+    }
 
+    public OrderItemDTO mapToOrderItemDTO(OrderItem orderItem) {
+        return modelMapper.map(orderItem, OrderItemDTO.class);
+    }
 }
 
