@@ -16,9 +16,28 @@ const ProductCard = ({
   const [selectViewProduct, setSelectViewProduct] = useState("");
   const isAvailable = quantity && Number(quantity) > 0;
 
+  const handleProductView = (product) => {
+    setSelectViewProduct(product);
+    setOpenProductViewModal(true);
+  };
+
   return (
     <div className="border rounded-lg shadow-xl overflow-hidden transition-shadow duration-300">
-      <div onClick={() => {}} className="w-full overflow-hidden aspect-[3/2]">
+      <div
+        onClick={() => {
+          handleProductView({
+            id: productId,
+            productName,
+            image,
+            description,
+            quantity,
+            price,
+            discount,
+            specialPrice,
+          });
+        }}
+        className="w-full overflow-hidden aspect-[3/2]"
+      >
         <img
           className="w-full h-full cursor-pointer transition-transform duration-300 transform hover:scale-105"
           src={image}
@@ -27,7 +46,18 @@ const ProductCard = ({
       </div>
       <div className="p-4 ">
         <h2
-          onClick={() => {}}
+          onClick={() => {
+            handleProductView({
+              id: productId,
+              productName,
+              image,
+              description,
+              quantity,
+              price,
+              discount,
+              specialPrice,
+            });
+          }}
           className="text-lg font-semibold mb-2 cursor-pointer"
         >
           {productName}
@@ -54,12 +84,14 @@ const ProductCard = ({
           )}
 
           <button
+          disabled={!isAvailable || btnLoader}
+          onClick={() => {}}
             className={`bg-blue-500 ${
               isAvailable ? "opacity-100 hover:bg-blue-600" : "opacity-70"
             } text-white py-2 px-3 rounded-lg items-center transition-colors 
-            duration-300 w-36 flex justify-center ml-auto`} 
-            >
-                <FaShoppingCart className="mr-2"/>
+            duration-300 w-36 flex justify-center ml-auto`}
+          >
+            <FaShoppingCart className="mr-2" />
             {isAvailable ? "Add to Cart" : "Stock Out"}
           </button>
         </div>
