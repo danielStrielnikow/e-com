@@ -4,8 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { fetchProducts } from "../store/actions";
 const Products = () => {
-    const isLoading = false;
-    const errorMessage = "";
+    const {isLoading, errorMessage} = useSelector(
+        (state) => state.errors
+    );
     const {products} = useSelector(
         (state) => state.products
     )
