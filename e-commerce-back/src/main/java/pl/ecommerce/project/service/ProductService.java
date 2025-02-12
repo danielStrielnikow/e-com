@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -56,10 +57,24 @@ public class ProductService {
         this.dtoMapper = dtoMapper;
     }
 
-    public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize, String sortBy,
+                                          String sortOrder, String keyword, String category) {
         Pageable pageDetails = getPageDetails(pageNumber, pageSize, sortBy, sortOrder);
-        Page<Product> productPage = productRepository.findAll(pageDetails);
+        Specification<Product> spec = Specification
+                .where((root, query, criteriaBuilder) -> criteriaBuilder.conjunction());
 
+        if (keyword != null && !keyword.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("productName")),
+                            "%" + keyword.toLowerCase() + "%"));
+        }
+
+        if (category != null && !category.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(root.get("category").get("categoryName"), category));
+        }
+
+        Page<Product> productPage = productRepository.findAll(spec, pageDetails);
         return mapToProductResponse(productPage);
     }
 
@@ -192,13 +207,18 @@ public class ProductService {
             throw new IllegalArgumentException("Page number must be non-negative and page size must be greater than 0");
         }
 
-        Sort sortByAndOrder;
-        try {
-            sortByAndOrder = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid sortOrder: " + sortOrder);
+        // Ustawienie domyślnego pola do sortowania, jeśli nie podano
+        if (sortBy == null || sortBy.isEmpty()) {
+            sortBy = "price";
         }
 
+        // Ustawienie domyślnego kierunku sortowania, jeśli nie podano lub jest niepoprawny
+        if (sortOrder == null || (!sortOrder.equalsIgnoreCase("asc")
+                && !sortOrder.equalsIgnoreCase("desc"))) {
+            sortOrder = "asc"; // Domyślnie sortujemy rosnąco
+        }
+
+        Sort sortByAndOrder = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
         return PageRequest.of(pageNumber, pageSize, sortByAndOrder);
     }
 
