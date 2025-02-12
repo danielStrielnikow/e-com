@@ -88,16 +88,20 @@ const ProductCard = ({
             disabled={!isAvailable || btnLoader}
             onClick={() => {}}
             className={`border border-green-500 text-green-500 opacity-0 
-              group-hover:opacity-100 transition-opacity${
-                isAvailable ? "opacity-100 hover:bg-green-200" : "opacity-"
-              } text-white py-2 px-2 rounded-lg items-center transition-colors 
-            duration-300  flex justify-center ml-auto`}
+              group-hover:opacity-100 transition-opacity duration-300${
+                isAvailable
+                  ? "opacity-100 hover:bg-green-200"
+                  : "opacity-50 cursor-not-allowed"
+              } py-2 px-2 rounded-lg items-center transition-colors 
+                flex justify-center ml-auto`}
           >
-            {isAvailable ? (
-              <MdAddShoppingCart className="text-2xl" />
-            ) : (
-              <MdOutlineRemoveShoppingCart className="text-2xl" />
-            )}
+            <span className="text-2xl">
+              {isAvailable ? (
+                <MdAddShoppingCart className="text-2xl" />
+              ) : (
+                <MdOutlineRemoveShoppingCart className="text-2xl" />
+              )}
+            </span>
           </button>
         </div>
       </div>
