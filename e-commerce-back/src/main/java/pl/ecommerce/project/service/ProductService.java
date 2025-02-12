@@ -39,6 +39,9 @@ public class ProductService {
     @Value("${project.image}")
     private String imagePath;
 
+    @Value("${image.base.url}")
+    private String imageBaseUrl;
+
     public ProductService(ProductRepository productRepository,
                           CategoryRepository categoryRepository,
                           FileServiceImpl fileService,
@@ -155,7 +158,11 @@ public class ProductService {
         if (productPage.isEmpty()) throw new APIException(AppErrors.ERROR_NO_PRODUCTS);
 
         List<ProductDTO> productDTOS = productPage.getContent().stream()
-                .map(dtoMapper::mapToProductDTO)
+                .map(product -> {
+                    ProductDTO productDTO = dtoMapper.mapToProductDTO(product);
+                    productDTO.setImage(constructImageUrl(product.getImage()));
+                    return productDTO;
+                })
                 .toList();
         return new ProductResponse(
                 productDTOS,
@@ -218,6 +225,10 @@ public class ProductService {
                 }).toList();
 
         cartDTOS.forEach(cart -> cartService.updateProductInCart(cart.getCartId(), productId));
+    }
+
+    private String constructImageUrl(String imageName) {
+        return imageBaseUrl.endsWith("/") ? imageBaseUrl + imageName : imageBaseUrl + "/" + imageName;
     }
 
 }
