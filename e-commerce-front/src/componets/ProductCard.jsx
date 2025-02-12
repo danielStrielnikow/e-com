@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { FaShoppingCart } from "react-icons/fa";
 import ProductViewModal from "./ProductViewModal";
+import { MdAddShoppingCart, MdOutlineRemoveShoppingCart } from "react-icons/md";
 
 const ProductCard = ({
   productId,
@@ -23,7 +23,7 @@ const ProductCard = ({
   };
 
   return (
-    <div className="border rounded-lg shadow-xl overflow-hidden transition-shadow duration-300">
+    <div className="border rounded-lg shadow-xl overflow-hidden transition-shadow duration-300 relative group">
       <div
         onClick={() => {
           handleProductView({
@@ -42,7 +42,8 @@ const ProductCard = ({
         <img
           className="w-full h-full cursor-pointer transition-transform duration-300 transform hover:scale-105"
           src={image}
-          alt={productName}/>
+          alt={productName}
+        />
       </div>
       <div className="p-4 ">
         <h2
@@ -84,23 +85,28 @@ const ProductCard = ({
           )}
 
           <button
-          disabled={!isAvailable || btnLoader}
-          onClick={() => {}}
-            className={`bg-blue-500 ${
-              isAvailable ? "opacity-100 hover:bg-blue-600" : "opacity-70"
-            } text-white py-2 px-3 rounded-lg items-center transition-colors 
-            duration-300 w-36 flex justify-center ml-auto`}
+            disabled={!isAvailable || btnLoader}
+            onClick={() => {}}
+            className={`border border-green-500 text-green-500 opacity-0 
+              group-hover:opacity-100 transition-opacity${
+                isAvailable ? "opacity-100 hover:bg-green-200" : "opacity-"
+              } text-white py-2 px-2 rounded-lg items-center transition-colors 
+            duration-300  flex justify-center ml-auto`}
           >
-            <FaShoppingCart className="mr-2" />
-            {isAvailable ? "Add to Cart" : "Stock Out"}
+            {isAvailable ? (
+              <MdAddShoppingCart className="text-2xl" />
+            ) : (
+              <MdOutlineRemoveShoppingCart className="text-2xl" />
+            )}
           </button>
         </div>
       </div>
       <ProductViewModal
-      open={openProductViewModal}
-      setOpen={setOpenProductViewModal}
-      product={selectViewProduct}
-      isAvailable={isAvailable}/>
+        open={openProductViewModal}
+        setOpen={setOpenProductViewModal}
+        product={selectViewProduct}
+        isAvailable={isAvailable}
+      />
     </div>
   );
 };
