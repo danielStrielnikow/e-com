@@ -1,6 +1,9 @@
 package pl.ecommerce.project.service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import pl.ecommerce.project.exception.APIException;
 import pl.ecommerce.project.exception.ResourceNotFoundException;
@@ -14,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Transactional
 public class OrderService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
@@ -23,6 +27,9 @@ public class OrderService {
     private final CartService cartService;
     private final ProductRepository productRepository;
     private final DTOMapper dtoMapper;
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public OrderService(OrderRepository orderRepository, CartRepository cartRepository,
                         AddressRepository addressRepository, PaymentRepository paymentRepository,
@@ -38,8 +45,8 @@ public class OrderService {
         this.dtoMapper = dtoMapper;
     }
 
-    @Transactional
-    public OrderDTO placeOrder(String emailId, Long addressId, String paymentMethod, String pgName, String pgPaymentId, String pgStatus, String pgResponseMessage) {
+    public OrderDTO placeOrder(String emailId, Long addressId, String paymentMethod,
+                               String pgName, String pgPaymentId, String pgStatus, String pgResponseMessage) {
         Cart cart = cartRepository.findCartByEmail(emailId);
         if (cart == null) {
             throw new ResourceNotFoundException("Cart", "email", emailId);
@@ -82,16 +89,17 @@ public class OrderService {
 
         cart.getCartItems().forEach(item -> {
             int quantity = item.getQuantity();
-            Product product = item.getProduct();
+            Product product = productRepository.findById(item.getProduct().getProductId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Product", "productId",
+                            item.getProduct().getProductId()));
 
             // Reduce stock quantity
-            product.setQuantity(product.getQuantity() - quantity);
-
             // Save product back to the database
-            productRepository.save(product);
+            updateProductStock(product.getProductId(), quantity);
 
             // Remove items from cart
             cartService.deleteProductFromCart(cart.getCartId(), item.getProduct().getProductId());
+            entityManager.refresh(product);
         });
 
         OrderDTO orderDTO = dtoMapper.mapToOrderDTO(savedOrder);
@@ -100,5 +108,14 @@ public class OrderService {
         orderDTO.setAddressId(addressId);
 
         return orderDTO;
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void updateProductStock(Long productId, int quantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+
+        product.setQuantity(product.getQuantity() - quantity);
+        productRepository.saveAndFlush(product);
     }
 }
