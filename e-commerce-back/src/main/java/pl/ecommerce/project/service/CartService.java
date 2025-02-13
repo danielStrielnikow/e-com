@@ -166,10 +166,8 @@ public class CartService {
             throw new ResourceNotFoundException("Product", "productId", productId);
         }
 
-        cart.setTotalPrice(cart.getTotalPrice() - (cartItem.getProductPrice() * cartItem.getQuantity()));
-
-        Product product = cartItem.getProduct();
-        product.setQuantity(product.getQuantity() + cartItem.getQuantity());
+        cart.setTotalPrice(cart.getTotalPrice() -
+                (cartItem.getProductPrice() * cartItem.getQuantity()));
 
         cartItemRepository.deleteCartItemByCartIdAndProductId(cartId, productId);
 

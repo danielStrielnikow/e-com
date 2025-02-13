@@ -28,8 +28,6 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final DTOMapper dtoMapper;
 
-    @PersistenceContext
-    private EntityManager entityManager;
 
     public OrderService(OrderRepository orderRepository, CartRepository cartRepository,
                         AddressRepository addressRepository, PaymentRepository paymentRepository,
@@ -89,17 +87,16 @@ public class OrderService {
 
         cart.getCartItems().forEach(item -> {
             int quantity = item.getQuantity();
-            Product product = productRepository.findById(item.getProduct().getProductId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Product", "productId",
-                            item.getProduct().getProductId()));
+            Product product = item.getProduct();
 
             // Reduce stock quantity
+            product.setQuantity(product.getQuantity() - quantity);
             // Save product back to the database
-            updateProductStock(product.getProductId(), quantity);
+            productRepository.save(product);
 
             // Remove items from cart
             cartService.deleteProductFromCart(cart.getCartId(), item.getProduct().getProductId());
-            entityManager.refresh(product);
+//            entityManager.refresh(product);
         });
 
         OrderDTO orderDTO = dtoMapper.mapToOrderDTO(savedOrder);
@@ -108,14 +105,5 @@ public class OrderService {
         orderDTO.setAddressId(addressId);
 
         return orderDTO;
-    }
-
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void updateProductStock(Long productId, int quantity) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
-
-        product.setQuantity(product.getQuantity() - quantity);
-        productRepository.saveAndFlush(product);
     }
 }
