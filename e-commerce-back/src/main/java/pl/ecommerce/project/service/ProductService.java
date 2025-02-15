@@ -60,22 +60,11 @@ public class ProductService {
     public ProductResponse getAllProducts(Integer pageNumber, Integer pageSize, String sortBy,
                                           String sortOrder, String keyword, String category) {
         Pageable pageDetails = getPageDetails(pageNumber, pageSize, sortBy, sortOrder);
-        Specification<Product> spec = Specification
-                .where((root, query, criteriaBuilder) -> criteriaBuilder.conjunction());
 
-        if (keyword != null && !keyword.isEmpty()) {
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(criteriaBuilder.lower(root.get("productName")),
-                            "%" + keyword.toLowerCase() + "%"));
-        }
+        Specification<Product> spec = buildProductSpecification(keyword, category);
+        Page<Product> pageProducts = productRepository.findAll(spec, pageDetails);
 
-        if (category != null && !category.isEmpty()) {
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.like(root.get("category").get("categoryName"), category));
-        }
-
-        Page<Product> productPage = productRepository.findAll(spec, pageDetails);
-        return mapToProductResponse(productPage);
+        return mapToProductResponse(pageProducts);
     }
 
     public ProductResponse searchByCategory(Long categoryId, Integer pageNumber,
@@ -199,10 +188,13 @@ public class ProductService {
     }
 
     private double calculateSpecialPrice(double price, double discount) {
-        return price - (discount / 100 * price);
+        if (discount < 0 || discount > 100) {
+            throw new IllegalArgumentException("Discount must be between 0 and 100");
+        }
+        return Math.max(0, price - (discount / 100 * price));
     }
 
-    private static Pageable getPageDetails(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    private  Pageable getPageDetails(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         if (pageNumber < 0 || pageSize <= 0) {
             throw new IllegalArgumentException("Page number must be non-negative and page size must be greater than 0");
         }
@@ -251,4 +243,18 @@ public class ProductService {
         return imageBaseUrl.endsWith("/") ? imageBaseUrl + imageName : imageBaseUrl + "/" + imageName;
     }
 
+    private Specification<Product> buildProductSpecification(String keyword, String category) {
+        Specification<Product> spec = Specification.where(null);
+        if (keyword != null && !keyword.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(criteriaBuilder.lower(root.get("productName")),
+                            "%" + keyword.toLowerCase() + "%"));
+        }
+
+        if (category != null && !category.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(root.get("category").get("categoryName"), category));
+        }
+        return spec;
+    }
 }
