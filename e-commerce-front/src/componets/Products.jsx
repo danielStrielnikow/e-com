@@ -6,10 +6,13 @@ import { fetchCategories } from "../store/actions";
 import Filter from "./Filter";
 import useProductFilter from "./useProductFilter";
 import Loader from "./Loader";
+import Paginations from "./Paginations";
 
 const Products = () => {
   const { isLoading, errorMessage } = useSelector((state) => state.errors);
-  const { products, categories } = useSelector((state) => state.products);
+  const { products, categories, pagination } = useSelector(
+    (state) => state.products
+  );
   const dispatch = useDispatch();
   useProductFilter();
 
@@ -21,7 +24,7 @@ const Products = () => {
     <div className="lg:px-14 sm:px-8 px-4 py-14 2xl:w-[90%] 2x1:mx-auto">
       <Filter categories={categories ? categories : []} />
       {isLoading ? (
-          <Loader/>
+        <Loader />
       ) : errorMessage ? (
         <div className="flex justify-center items-center h-[200px]">
           <FaExclamationTriangle className="text-slate-800 text-3xl mr-2" />
@@ -34,6 +37,12 @@ const Products = () => {
           <div className="pb-6 pt-14 grid 2xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 gap-y-6 gap-x-6">
             {products &&
               products.map((item, i) => <ProductCard key={i} {...item} />)}
+          </div>
+          <div className="flex justify-center pt-10">
+            <Paginations 
+            numberOfPage = {pagination?.totalPages}
+            totalProducts = {pagination?.totalElements}
+            />
           </div>
         </div>
       )}
