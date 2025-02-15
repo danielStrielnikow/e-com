@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ProductViewModal from "./ProductViewModal";
 import { MdAddShoppingCart, MdOutlineRemoveShoppingCart } from "react-icons/md";
-import truncateText from "./truncateText";
+import truncateText from "../../utils/truncateText";
 
 const ProductCard = ({
   productId,
