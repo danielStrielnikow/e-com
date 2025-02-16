@@ -3,6 +3,7 @@ import { useState } from "react";
 import { FaShoppingCart, FaSignInAlt, FaStore } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
 import { IoIosMenu } from "react-icons/io";
+import { IoMdHeartEmpty } from "react-icons/io";
 import { Link, useLocation } from "react-router-dom";
 
 const NavBar = () => {
@@ -62,6 +63,22 @@ const NavBar = () => {
               to="/contact"
             >
               Contact
+            </Link>
+          </li>
+          <li className="font-[500px] transition-all duration-150">
+            <Link
+              className={`${
+                path === "/list" ? "text-white font-semibold" : "text-gray-200"
+              }`}
+              to="/list"
+            >
+              <Badge
+                color="primary"
+                overlap="circular"
+                anchorOrigin={{ vertical: "top", horizontal: "right" }}
+              >
+                <IoMdHeartEmpty size={25} />
+              </Badge>
             </Link>
           </li>
 
