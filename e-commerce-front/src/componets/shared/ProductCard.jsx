@@ -29,21 +29,37 @@ const ProductCard = ({
 
   useEffect(() => {
     const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    setIsFavorite(savedFavorites.includes(productId));
+    setIsFavorite(savedFavorites.some((product) => product.id === productId));
   }, [productId]);
 
+  // Twój kod w ProductCard
   const toggleFavorite = () => {
     const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
     let updatedFavorites;
 
-    if (savedFavorites.includes(productId)) {
-      updatedFavorites = savedFavorites.filter((id) => id !== productId);
+    const productToAdd = {
+      id: productId,
+      productName,
+      image,
+      price,
+      quantity,
+      discount,
+      specialPrice,
+      description,
+    };
+
+    // Sprawdzamy, czy produkt jest już w ulubionych
+    if (savedFavorites.some((product) => product.id === productId)) {
+      updatedFavorites = savedFavorites.filter(
+        (product) => product.id !== productId
+      );
     } else {
-      updatedFavorites = [...savedFavorites, productId];
+      updatedFavorites = [...savedFavorites, productToAdd];
     }
 
+    // Zapisujemy zaktualizowaną listę ulubionych w localStorage
     localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
-    setIsFavorite(updatedFavorites.includes(productId));
+    setIsFavorite(updatedFavorites.some((product) => product.id === productId));
   };
 
   return (

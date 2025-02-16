@@ -6,7 +6,7 @@ import Home from "./componets/home/Home";
 import NavBar from "./componets/shared/NavBar";
 import About from "./componets/About";
 import Contact from "./componets/Contact";
-import List from "./componets/List";
+import FavoritesList from "./componets/FavoritesList";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -19,7 +19,7 @@ function App() {
         <Route path="/products" element={<Products />} />
         <Route path="/about" element={<About/>} />
         <Route path="/contact" element={<Contact/>} />
-        <Route path="/list" element={<List/>} />
+        <Route path="/list" element={<FavoritesList/>} />
       </Routes>
     </Router>
   );
