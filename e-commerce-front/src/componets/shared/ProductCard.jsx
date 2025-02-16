@@ -32,7 +32,6 @@ const ProductCard = ({
     setIsFavorite(savedFavorites.some((product) => product.id === productId));
   }, [productId]);
 
-  // Twój kod w ProductCard
   const toggleFavorite = () => {
     const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
     let updatedFavorites;
@@ -48,7 +47,6 @@ const ProductCard = ({
       description,
     };
 
-    // Sprawdzamy, czy produkt jest już w ulubionych
     if (savedFavorites.some((product) => product.id === productId)) {
       updatedFavorites = savedFavorites.filter(
         (product) => product.id !== productId
@@ -57,13 +55,12 @@ const ProductCard = ({
       updatedFavorites = [...savedFavorites, productToAdd];
     }
 
-    // Zapisujemy zaktualizowaną listę ulubionych w localStorage
     localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
     setIsFavorite(updatedFavorites.some((product) => product.id === productId));
   };
 
   return (
-    <div className="border rounded-lg shadow-xl overflow-hidden transition-shadow duration-300 relative group">
+    <div className="border rounded-lg shadow-xl overflow-hidden transition-shadow duration-300 relative group w-full h-[400px] flex flex-col">
       <div
         onClick={() => {
           handleProductView({
@@ -77,10 +74,10 @@ const ProductCard = ({
             specialPrice,
           });
         }}
-        className="w-full overflow-hidden aspect-[3/2] relative"
+        className="w-full h-48 overflow-hidden relative"
       >
         <img
-          className="w-full h-full cursor-pointer transition-transform duration-300 transform hover:scale-105"
+          className="w-full h-full object-cover cursor-pointer transition-transform duration-300 transform hover:scale-105"
           src={image}
           alt={productName}
         />
@@ -90,13 +87,13 @@ const ProductCard = ({
             toggleFavorite();
           }}
           className={`absolute top-2 right-2 bg-white/80 rounded-lg p-2 shadow-md 
-                       transition-all duration-300
-                     hover:bg-gray-200
-                     ${
-                       isFavorite
-                         ? "opacity-100"
-                         : "opacity-0 group-hover:opacity-100"
-                     }`}
+                   transition-all duration-300
+                 hover:bg-gray-200
+                 ${
+                   isFavorite
+                     ? "opacity-100"
+                     : "opacity-0 group-hover:opacity-100"
+                 }`}
         >
           <span className="text-2xl">
             {isFavorite ? (
@@ -108,33 +105,35 @@ const ProductCard = ({
         </button>
       </div>
 
-      <div className="p-4">
-        <h2
-          onClick={() => {
-            handleProductView({
-              id: productId,
-              productName,
-              image,
-              description,
-              quantity,
-              price,
-              discount,
-              specialPrice,
-            });
-          }}
-          className="text-lg font-semibold mb-2 cursor-pointer"
-        >
-          {truncateText(productName, 50)}
-        </h2>
+      <div className="p-4 flex-1 flex flex-col justify-between">
+        <div>
+          <h2
+            onClick={() => {
+              handleProductView({
+                id: productId,
+                productName,
+                image,
+                description,
+                quantity,
+                price,
+                discount,
+                specialPrice,
+              });
+            }}
+            className="text-lg font-semibold mb-2 cursor-pointer"
+          >
+            {truncateText(productName, 50)}
+          </h2>
 
-        <div className="min-h-20 max-h-20">
           <p className="text-gray-600 text-sm">
             {truncateText(description, 80)}
           </p>
         </div>
 
         {!about && (
-          <div className="flex items-center justify-between">
+          <div className="flex items-end justify-between h-12">
+            {" "}
+
             {specialPrice ? (
               <div className="flex flex-col">
                 <span className="text-gray-400 line-through">
@@ -149,9 +148,8 @@ const ProductCard = ({
                 PLN {Number(price).toFixed(2)}
               </span>
             )}
-
             <button
-              disabled={!isAvailable}
+              disabled={!isAvailable }
               onClick={() => {}}
               className={`border border-green-500 text-green-500 opacity-0 
               group-hover:opacity-100 transition-opacity duration-300${
