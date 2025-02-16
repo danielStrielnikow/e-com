@@ -12,6 +12,7 @@ const ProductCard = ({
   price,
   discount,
   specialPrice,
+  about = false,
 }) => {
   const [openProductViewModal, setOpenProductViewModal] = useState(false);
   const btnLoader = false;
@@ -19,8 +20,10 @@ const ProductCard = ({
   const isAvailable = quantity && Number(quantity) > 0;
 
   const handleProductView = (product) => {
-    setSelectViewProduct(product);
-    setOpenProductViewModal(true);
+    if (!about) {
+      setSelectViewProduct(product);
+      setOpenProductViewModal(true);
+    }
   };
 
   return (
@@ -71,42 +74,44 @@ const ProductCard = ({
           </p>
         </div>
 
-        <div className="flex items-center justtify-between">
-          {specialPrice ? (
-            <div className="flex flex-col">
-              <span className="text-gray-400 line-through">
+        {!about && (
+          <div className="flex items-center justtify-between">
+            {specialPrice ? (
+              <div className="flex flex-col">
+                <span className="text-gray-400 line-through">
+                  PLN {Number(price).toFixed(2)}
+                </span>
+                <span className="text-xl font-bold text-slate-700">
+                  PLN {Number(specialPrice).toFixed(2)}
+                </span>
+              </div>
+            ) : (
+              <span className="text-xl font-bold text-slate-700">
                 PLN {Number(price).toFixed(2)}
               </span>
-              <span className="text-xl font-bold text-slate-700">
-                PLN {Number(specialPrice).toFixed(2)}
-              </span>
-            </div>
-          ) : (
-            <span className="text-xl font-bold text-slate-700">
-              PLN {Number(price).toFixed(2)}
-            </span>
-          )}
+            )}
 
-          <button
-            disabled={!isAvailable || btnLoader}
-            onClick={() => {}}
-            className={`border border-green-500 text-green-500 opacity-0 
+            <button
+              disabled={!isAvailable || btnLoader}
+              onClick={() => {}}
+              className={`border border-green-500 text-green-500 opacity-0 
               group-hover:opacity-100 transition-opacity duration-300${
                 isAvailable
                   ? "opacity-100 hover:bg-green-200"
                   : "opacity-50 cursor-not-allowed"
               } py-2 px-2 rounded-lg items-center transition-colors 
                 flex justify-center ml-auto`}
-          >
-            <span className="text-2xl">
-              {isAvailable ? (
-                <MdAddShoppingCart className="text-2xl" />
-              ) : (
-                <MdOutlineRemoveShoppingCart className="text-2xl" />
-              )}
-            </span>
-          </button>
-        </div>
+            >
+              <span className="text-2xl">
+                {isAvailable ? (
+                  <MdAddShoppingCart className="text-2xl" />
+                ) : (
+                  <MdOutlineRemoveShoppingCart className="text-2xl" />
+                )}
+              </span>
+            </button>
+          </div>
+        )}
       </div>
       <ProductViewModal
         open={openProductViewModal}
