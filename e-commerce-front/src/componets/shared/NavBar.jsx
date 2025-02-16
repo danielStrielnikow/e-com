@@ -10,9 +10,9 @@ const NavBar = () => {
   const [navbarOpen, setNavbarOpen] = useState(false);
   return (
     <div className="h-[70px] bg-custom-gradient text-white z-50 flex items-center sticky top-0">
-      <div className="lg:px-14 sm:-px-8 w-full flex justify-between">
+      <div className="lg:px-14 sm:px-8 w-full flex justify-between">
         <Link to={"/"} className="flex items-center text-2xl font-bold">
-          <FaStore className="mr2 text-3xl" />
+          <FaStore className="mr-2 text-3xl" />
           <span className="font-[Poppins]">E-Shop</span>
         </Link>
         <ul
