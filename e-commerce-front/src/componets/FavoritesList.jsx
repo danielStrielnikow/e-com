@@ -55,7 +55,7 @@ const FavoritesList = () => {
                 alt={product.productName}
               />
 
-              <div className="ml-6 flex-1  flex flex-col justify-between pr-12 min-h-[150px] max-h-[150px]">
+              <div className="ml-6 flex-1 flex flex-col justify-between min-h-[150px] pr-12">
                 <h2 className="text-xl font-semibold">
                   {truncateText(product.productName, 60)}
                 </h2>
@@ -63,7 +63,7 @@ const FavoritesList = () => {
                   {truncateText(product.description, 100)}
                 </p>
 
-                <div className="mt-6 flex items-center justify-between">
+                <div className="mt-4">
                   {product.specialPrice ? (
                     <div className="flex flex-col">
                       <span className="text-xl font-bold text-slate-700">

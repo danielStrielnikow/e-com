@@ -3,6 +3,9 @@ import ProductViewModal from "./ProductViewModal";
 import { MdAddShoppingCart, MdOutlineRemoveShoppingCart } from "react-icons/md";
 import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
 import truncateText from "../../utils/truncateText";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../../store/actions";
+import toast from "react-hot-toast";
 
 const ProductCard = ({
   productId,
@@ -19,12 +22,17 @@ const ProductCard = ({
   const [selectViewProduct, setSelectViewProduct] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
   const isAvailable = quantity && Number(quantity) > 0;
+  const dispatch = useDispatch();
 
   const handleProductView = (product) => {
     if (!about) {
       setSelectViewProduct(product);
       setOpenProductViewModal(true);
     }
+  };
+
+  const addToCartHandler = (cartItem) => {
+    dispatch(addToCart(cartItem, 1, toast));
   };
 
   useEffect(() => {
@@ -133,7 +141,6 @@ const ProductCard = ({
         {!about && (
           <div className="flex items-end justify-between h-12">
             {" "}
-
             {specialPrice ? (
               <div className="flex flex-col">
                 <span className="text-gray-400 line-through">
@@ -149,8 +156,18 @@ const ProductCard = ({
               </span>
             )}
             <button
-              disabled={!isAvailable }
-              onClick={() => {}}
+              disabled={!isAvailable}
+              onClick={() =>
+                addToCartHandler({
+                  image,
+                  productName,
+                  description,
+                  specialPrice,
+                  price,
+                  productId,
+                  quantity,
+                })
+              }
               className={`border border-green-500 text-green-500 opacity-0 
               group-hover:opacity-100 transition-opacity duration-300${
                 isAvailable
