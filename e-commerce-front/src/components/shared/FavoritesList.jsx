@@ -1,11 +1,15 @@
 import { useState, useEffect } from "react";
-import ProductViewModal from "./shared/ProductViewModal";
+import ProductViewModal from "./ProductViewModal";
 import { IoMdHeart, IoMdHeartDislike } from "react-icons/io";
 import { MdAddShoppingCart, MdOutlineRemoveShoppingCart } from "react-icons/md";
-import truncateText from "../utils/truncateText";
+import truncateText from "../../utils/truncateText";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../../store/actions";
 
 const FavoritesList = () => {
   const [favorites, setFavorites] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const savedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
@@ -18,10 +22,15 @@ const FavoritesList = () => {
     );
     localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
     setFavorites(updatedFavorites);
+    toast.success("Removed from favorites");
   };
 
   const checkAvailability = (quantity) => {
     return Number(quantity) > 0;
+  };
+
+  const addToCartHandler = (cartItem) => {
+    dispatch(addToCart(cartItem, 1, toast));
   };
 
   return (
@@ -97,7 +106,17 @@ const FavoritesList = () => {
               <div className="absolute bottom-3 right-3 z-10">
                 <button
                   disabled={!checkAvailability(product.quantity)}
-                  onClick={() => {}}
+                  onClick={() =>
+                    addToCartHandler({
+                      productId: product.id,
+                      productName: product.productName,
+                      image: product.image,
+                      description: product.description,
+                      specialPrice: product.specialPrice,
+                      price: product.price,
+                      quantity: product.quantity,
+                    })
+                  }
                   className={`border border-green-500 text-green-500 py-2 px-2 rounded-lg flex items-center justify-center 
                   transition-opacity duration-300 ${
                     checkAvailability(product.quantity)

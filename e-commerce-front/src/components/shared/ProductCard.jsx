@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/actions";
 import toast from "react-hot-toast";
 
+
 const ProductCard = ({
   productId,
   productName,
