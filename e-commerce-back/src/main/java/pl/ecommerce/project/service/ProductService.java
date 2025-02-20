@@ -43,6 +43,9 @@ public class ProductService {
     @Value("${image.base.url}")
     private String imageBaseUrl;
 
+    @Value("${project.default}")
+    private String defaultImage;
+
     public ProductService(ProductRepository productRepository,
                           CategoryRepository categoryRepository,
                           FileServiceImpl fileService,
@@ -98,7 +101,13 @@ public class ProductService {
         if (productExists) throw new APIException(AppErrors.ERROR_PRODUCT_EXISTS);
 
         Product product = dtoMapper.mapProductToEntity(productDTO);
-        product.setImage(AppErrors.DEFAULT_IMAGE);
+
+        if (productDTO.getImage() == null || productDTO.getImage().isEmpty()) {
+            product.setImage(defaultImage);
+        } else {
+            product.setImage(productDTO.getImage());
+        }
+
         product.setCategory(category);
         product.setSpecialPrice(calculateSpecialPrice(product.getPrice(), product.getDiscount()));
 

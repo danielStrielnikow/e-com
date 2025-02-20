@@ -22,7 +22,7 @@ public class AddressController {
         this.authUtil = authUtil;
     }
 
-    @PostMapping("/address")
+    @PostMapping("/addresses")
     public ResponseEntity<AddressDTO> createAddress(@Valid @RequestBody AddressDTO addressDTO) {
         User user = authUtil.loggedInUser();
         AddressDTO savedAddressDTO = addressService.createAddress(addressDTO, user);
@@ -30,7 +30,7 @@ public class AddressController {
 
     }
 
-    @GetMapping("/address")
+    @GetMapping("/addresses")
     public ResponseEntity<List<AddressDTO>> getAllAddress() {
         List<AddressDTO> address = addressService.getAllAddresses();
         return new ResponseEntity<>(address, HttpStatus.OK);
