@@ -211,7 +211,7 @@ public class CartService {
             cartItemRepository.deleteAllByCartId(existingCart.getCartId());
         }
 
-        double totalPrice = 0.00;
+        double totalPrice = INITIAL_NUMBER;
 
         // Process each item in the request to add to the cart
         for (CartItemDTO cartItemDTO : cartItems) {
