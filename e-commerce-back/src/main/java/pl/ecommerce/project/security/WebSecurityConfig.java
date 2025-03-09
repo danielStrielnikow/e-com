@@ -83,8 +83,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/test/**").permitAll()
                                 .requestMatchers("/images/**").permitAll()
                                 .anyRequest().authenticated()
-                )
-                .cors(Customizer.withDefaults()); // Dodanie obsługi CORS
+                );
 
         http.authenticationProvider(authenticationProvider());
 

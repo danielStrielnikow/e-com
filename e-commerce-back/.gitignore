@@ -4,11 +4,10 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-#Applciation.yml
-/src/main/resources/application.yml
 
 #.DS_Store
 .DS_Store
+.env
 
 ### STS ###
 .apt_generated

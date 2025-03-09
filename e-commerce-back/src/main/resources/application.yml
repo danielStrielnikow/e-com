@@ -1,0 +1,50 @@
+spring:
+  security:
+    user:
+      name: ${SECURITY_NAME}
+      password: ${SECURITY_PASSWORD}
+#  h2:
+#    console:
+#      enabled: true
+#  datasource:
+#    url: jdbc:h2:mem:test
+  app:
+    jwtSecret: ${JWT_SECRET}
+    jwtExpirationMs: 3600000
+    jwtCookieName: ${JWT_COOKIE}
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USER}
+    password: ${DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+#logging:
+#  level:
+#    org:
+#      springframework: DEBUG
+#      security: DEBUG
+#      hibernate:
+#        SQL: DEBUG
+#    pl:
+#      ecommerce:
+#        project: DEBUG
+project:
+  image: images/
+  default: default_image.png
+
+frontend:
+  url: ${FRONT_URL}
+
+image:
+  base:
+    url: ${BASE_URL_IMAGES}
+#Stripe key
+stripe:
+  secret:
+    key: ${STRIPE_API_KEY}
+
