@@ -8,6 +8,7 @@ import {
 import { Divider } from "@mui/material";
 import { MdClose, MdDone } from "react-icons/md";
 import Status from "./Status";
+import {CURRENCY} from "../../constants";
 
 function ProductViewModal({ open, setOpen, product, isAvailable }) {
   const {
@@ -53,16 +54,16 @@ function ProductViewModal({ open, setOpen, product, isAvailable }) {
                     {specialPrice ? (
                       <div className="flex items-center gap-2">
                         <span className="text-gray-400 line-through">
-                          PLN {Number(price).toFixed(2)}
+                          {CURRENCY} {Number(price).toFixed(2)}
                         </span>
                         <span className="sm:text-xl font-semibold text-slate-700">
-                          PLN {Number(specialPrice).toFixed(2)}
+                          {CURRENCY} {Number(specialPrice).toFixed(2)}
                         </span>
                       </div>
                     ) : (
                       <span className="text-xl font-bold">
                         {" "}
-                        PLN {Number(price).toFixed(2)}
+                        {CURRENCY} {Number(price).toFixed(2)}
                       </span>
                     )}
                     {isAvailable ? (

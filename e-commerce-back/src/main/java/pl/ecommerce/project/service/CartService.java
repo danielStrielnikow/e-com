@@ -82,7 +82,6 @@ public class CartService {
             throw new APIException("No cart exists");
         }
 
-
         return carts.stream().map(cart -> {
             CartDTO cartDTO = dtoMapper.mapToCartDTO(cart);
 
@@ -212,7 +211,7 @@ public class CartService {
             cartItemRepository.deleteAllByCartId(existingCart.getCartId());
         }
 
-        double totalPrice = INITIAL_NUMBER;
+        double totalPrice = 0.00;
 
         // Process each item in the request to add to the cart
         for (CartItemDTO cartItemDTO : cartItems) {
@@ -220,7 +219,8 @@ public class CartService {
             Integer quantity = cartItemDTO.getQuantity();
 
             // Find the product by ID
-            Product product = fetchProductById(productId);
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
             // Directly update product stock and total price
             // product.setQuantity(product.getQuantity() - quantity);

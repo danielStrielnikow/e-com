@@ -1,11 +1,10 @@
 import api from "../../api/api"
-
-
+import {CURRENCY_LOWERCASE} from "../../constants";
 
 export const fetchProducts = (queryString) => async (dispatch) => {
     try {
         dispatch({ type: "IS_FETCHING" });
-        const { data } = await api.get(`public/products?${queryString}`);
+        const { data } = await api.get(`/public/products?${queryString}`);
         dispatch({
             type: "FETCH_PRODUCTS",
             payload: data.content,
@@ -48,8 +47,6 @@ export const fetchCategories = () => async (dispatch) => {
          });
     }
 };
-
-
 
 
 export const addToCart = (data, qty = 1, toast) => 
@@ -164,11 +161,13 @@ export const logOutUser = (navigate) => (dispatch) => {
 };
 
 export const addUpdateUserAddress =
-     (sendData, toast, addressId, setOpenAddressModal) => async (dispatch, getState) => {
+     (sendData, toast, addressId, setOpenAddressModal) => async (dispatch, getState) => {  
+          
     const { user } = getState().auth;
     await api.post(`/addresses`, sendData, {
           headers: { Authorization: "Bearer " + user.jwtToken },
         });
+
     dispatch({ type:"BUTTON_LOADER" });
     try {
         if (!addressId) {
@@ -292,7 +291,7 @@ export const createStripePaymentSecret
             dispatch({ type: "IS_FETCHING" });
             const { data } = await api.post("/order/stripe-client-secret", {
                 "amount": Number(totalPrice) * 100,
-                "currency": "usd"
+                "currency": {currency: CURRENCY_LOWERCASE}
               });
             dispatch({ type: "CLIENT_SECRET", payload: data });
               localStorage.setItem("client-secret", JSON.stringify(data));

@@ -6,6 +6,7 @@ import truncateText from "../../utils/truncateText";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/actions";
+import {CURRENCY} from "../../constants";
 
 const FavoritesList = () => {
   const [favorites, setFavorites] = useState([]);
@@ -76,12 +77,12 @@ const FavoritesList = () => {
                   {product.specialPrice ? (
                     <div className="flex flex-col">
                       <span className="text-xl font-bold text-slate-700">
-                        PLN {Number(product.specialPrice).toFixed(2)}
+                        {CURRENCY} {Number(product.specialPrice).toFixed(2)}
                       </span>
                     </div>
                   ) : (
                     <span className="text-xl font-bold text-slate-700">
-                      PLN {Number(product.price).toFixed(2)}
+                      {CURRENCY} {Number(product.price).toFixed(2)}
                     </span>
                   )}
                 </div>

@@ -19,7 +19,7 @@ const StripePayment = () => {
     if (!clientSecret) {
       dispatch(createStripePaymentSecret(totalPrice));
     }
-  }, [clientSecret]);
+  }, [clientSecret, totalPrice]);
 
   if (isLoading) {
     return (

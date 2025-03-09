@@ -6,6 +6,7 @@ import truncateText from "../../utils/truncateText";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../store/actions";
 import toast from "react-hot-toast";
+import {CURRENCY} from "../../constants";
 
 
 const ProductCard = ({
@@ -145,15 +146,15 @@ const ProductCard = ({
             {specialPrice ? (
               <div className="flex flex-col">
                 <span className="text-gray-400 line-through">
-                  PLN {Number(price).toFixed(2)}
+                  {CURRENCY} {Number(price).toFixed(2)}
                 </span>
                 <span className="text-xl font-bold text-slate-700">
-                  PLN {Number(specialPrice).toFixed(2)}
+                  {CURRENCY} {Number(specialPrice).toFixed(2)}
                 </span>
               </div>
             ) : (
               <span className="text-xl font-bold text-slate-700">
-                PLN {Number(price).toFixed(2)}
+                {CURRENCY} {Number(price).toFixed(2)}
               </span>
             )}
             <button
