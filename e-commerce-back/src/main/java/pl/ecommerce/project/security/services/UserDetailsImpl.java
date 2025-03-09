@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,17 +20,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * do reprezentowania użytkownika w kontekście bezpieczeństwa.
  */
 @NoArgsConstructor
-@Getter
+@Data
 public class UserDetailsImpl implements UserDetails {
-    @Serial
     private static final long serialVersionUID = 1L;
 
     private Long id;
+
     private String username;
+
     private String email;
 
     @JsonIgnore
     private String password;
+
     private Collection<? extends GrantedAuthority> authorities;
 
     public UserDetailsImpl(Long id, String username, String email, String password,
@@ -42,12 +45,7 @@ public class UserDetailsImpl implements UserDetails {
     }
 
     public static UserDetailsImpl build(User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("User cannot be null");
-        }
-
         List<GrantedAuthority> authorities = user.getRoles().stream()
-                .filter(Objects::nonNull)
                 .map(role -> new SimpleGrantedAuthority(role.getRoleName().name()))
                 .collect(Collectors.toList());
 
@@ -62,6 +60,14 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     @Override
@@ -104,8 +110,4 @@ public class UserDetailsImpl implements UserDetails {
         return Objects.equals(id, user.id);
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
 }

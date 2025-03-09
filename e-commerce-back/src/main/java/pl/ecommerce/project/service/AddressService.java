@@ -107,6 +107,6 @@ public class AddressService {
         address.setCity(addressDTO.getCity());
         address.setState(addressDTO.getState());
         address.setCountry(addressDTO.getCountry());
-        address.setPinCode(addressDTO.getPinCode());
+        address.setPincode(addressDTO.getPincode());
     }
 }

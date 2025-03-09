@@ -93,7 +93,6 @@ public class OrderService {
 
             // Remove items from cart
             cartService.deleteProductFromCart(cart.getCartId(), item.getProduct().getProductId());
-//            entityManager.refresh(product);
         });
 
         OrderDTO orderDTO = dtoMapper.mapToOrderDTO(savedOrder);

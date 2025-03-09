@@ -13,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:5173")
 public class AddressController {
     private final AddressService addressService;
     private final AuthUtil authUtil;
@@ -43,23 +44,23 @@ public class AddressController {
         return new ResponseEntity<>(userAddress, HttpStatus.OK);
     }
 
-    @GetMapping("/address/{addressId}")
-    public ResponseEntity<AddressDTO> getAddress(@PathVariable Long addressId) {
-        AddressDTO address = addressService.getAddressById(addressId);
+    @GetMapping("/addresses/{addressesId}")
+    public ResponseEntity<AddressDTO> getAddress(@PathVariable Long addressesId) {
+        AddressDTO address = addressService.getAddressById(addressesId);
         return new ResponseEntity<>(address, HttpStatus.OK);
     }
 
-    @PutMapping("/address/{addressId}")
-    public ResponseEntity<AddressDTO> updateAddress(@PathVariable Long addressId,
+    @PutMapping("/addresses/{addressesId}")
+    public ResponseEntity<AddressDTO> updateAddress(@PathVariable Long addressesId,
                                                     @RequestBody AddressDTO addressDTO) {
-        AddressDTO address = addressService.updateAddress(addressId, addressDTO);
+        AddressDTO address = addressService.updateAddress(addressesId, addressDTO);
         return new ResponseEntity<>(address, HttpStatus.OK);
     }
 
 
-    @DeleteMapping("/address/{addressId}")
-    public ResponseEntity<String> deleteAddress(@PathVariable Long addressId) {
-        String status = addressService.deleteAddress(addressId);
+    @DeleteMapping("/addresses/{addressesId}")
+    public ResponseEntity<String> deleteAddress(@PathVariable Long addressesId) {
+        String status = addressService.deleteAddress(addressesId);
         return new ResponseEntity<>(status, HttpStatus.OK);
     }
 }
